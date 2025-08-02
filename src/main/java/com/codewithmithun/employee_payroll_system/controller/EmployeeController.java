@@ -5,9 +5,10 @@ import com.codewithmithun.employee_payroll_system.service.EmployeeService;
 import com.codewithmithun.employee_payroll_system.service.PayrollService;
 import com.codewithmithun.employee_payroll_system.service.ReportService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
@@ -51,5 +52,16 @@ public class EmployeeController {
                 .thenApply(ResponseEntity::ok);
     }
 
+    // report generate in PDF format
+    @GetMapping("/report/pdf")
+    public ResponseEntity<byte[]> getPayrollPdfReport() throws IOException {
+        byte[] pdf = reportService.generatePayrollReportPdf();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(ContentDisposition.builder("attachment")
+                .filename("Payroll-report.pdf")
+                .build());
 
+        return new ResponseEntity<>(pdf,headers, HttpStatus.OK);
+    }
 }
